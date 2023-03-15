@@ -20,6 +20,7 @@ export const createServer =
         s.on('data', (data: Buffer) => {
           deps.logger.log('data given', data.toString())
           // todo apply handler here
+          deps.commandDispatcher(data.toString())
         })
         // heart beat
         if (O.getOrElse(() => false)) O.fromNullable(srvConfig.enableHeartBeatResponse)
@@ -29,6 +30,14 @@ export const createServer =
             s.write('') // todo client response here
           }, interval)
         }
+
+        s.on('end', () => {
+          deps.logger.log('Server is stopping...')
+          // clear intervals if exists
+          if (timer) {
+            clearInterval(timer)
+          }
+        })
       })
       return E.right(server)
     } catch (e) {

@@ -8,8 +8,14 @@ import * as process from 'process'
 import { serverConfig } from './serverConfig'
 import { IServerDependencies } from './types'
 import { createServerLogger } from '../shared/logger/serverLogger'
+import { defaultClientCmdDispatcher } from './cmd-dispatchers'
+import { ICommandHandlerDependencies } from './types/ICommandHandlerDependencies'
+import { InMemorySubscriberStorage } from './storage/InMemorySubscriberStorage'
 dotenv.config()
 
+/**
+ * Shared config
+ */
 const sharedConfig: ISharedConfig = {
   port: ((p: string | undefined) => {
     if (!p) {
@@ -21,10 +27,21 @@ const sharedConfig: ISharedConfig = {
   })(process.env.HTTP_PORT),
 }
 
+/**
+ * dependencies of command handler
+ */
+const commandHandlerDeps: ICommandHandlerDependencies = {
+  logger: createServerLogger('server/cmdHandler'),
+  subscriberStorage: new InMemorySubscriberStorage(),
+}
+
+/**
+ * Server dependencies
+ */
 const serverDeps: IServerDependencies = {
   logger: createServerLogger(),
   clientResponseCodec: () => false, // todo
-  commandDispatcher: () => false, // todo
+  commandDispatcher: (cmd) => defaultClientCmdDispatcher(cmd)(commandHandlerDeps),
   sharedConfig,
 }
 
