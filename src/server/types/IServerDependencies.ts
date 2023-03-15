@@ -1,4 +1,4 @@
-import { ILogger } from '../../shared/types/ILogger'
+import { ILogger } from '../../shared/types'
 import { ISharedConfig } from '../../shared/types/ISharedConfig'
 import { Reader } from 'fp-ts/Reader'
 import { ICommandHandlerDependencies } from './ICommandHandlerDependencies'
