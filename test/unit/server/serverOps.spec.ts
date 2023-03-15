@@ -1,12 +1,13 @@
 import * as E from 'fp-ts/Either'
-import { splitClientMessages, parseClientMessages } from '../../../src/server/serverOps'
+import { parseClientMessages } from '../../../src/server/serverOps'
 import { CLIENT_ID_SEPARATOR, MESSAGE_SEPARATOR } from '../../../src/shared/constants'
 import { CMD_COUNT_SUBSCRIBERS, CMD_SUBSCRIBE, IClientRequest } from '../../../src/shared/types'
+import { splitMessagesToChunks } from '../../../src/shared/utils/parsers'
 
 describe('Server OPS', () => {
   it('should split series of messages correctly', async () => {
     const str = `msg1${MESSAGE_SEPARATOR}msg2`
-    const result: Array<string> = splitClientMessages(str)
+    const result: Array<string> = splitMessagesToChunks(str)
 
     expect(result.length).toEqual(2)
     expect(result[0]).toEqual('msg1')
