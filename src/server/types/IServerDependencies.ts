@@ -1,4 +1,4 @@
-import { ILogger } from '../../shared/types'
+import { IClientRequest, IGenericServerResponse, ILogger } from '../../shared/types'
 import { ISharedConfig } from '../../shared/types/ISharedConfig'
 import { Reader } from 'fp-ts/Reader'
 import { ICommandHandlerDependencies } from './ICommandHandlerDependencies'
@@ -8,7 +8,6 @@ export interface IServerDependencies {
 
   sharedConfig: ISharedConfig
 
-  clientResponseCodec: unknown
-  // commandDispatcher: (msg: unknown) => Reader<ICommandHandlerDependencies, string> // todo replace unknown
-  commandDispatcher: (msg: unknown) => string // todo replace unknown
+  clientResponseCodec: (str: IGenericServerResponse) => string
+  commandDispatcher: (msg: IClientRequest) => IGenericServerResponse
 }

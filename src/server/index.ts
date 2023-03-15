@@ -11,6 +11,7 @@ import { createServerLogger } from '../shared/logger/serverLogger'
 import { defaultClientCmdDispatcher } from './cmd-dispatchers'
 import { ICommandHandlerDependencies } from './types/ICommandHandlerDependencies'
 import { InMemorySubscriberStorage } from './storage/InMemorySubscriberStorage'
+import { defaultCodec } from './codecs'
 dotenv.config()
 
 /**
@@ -40,7 +41,7 @@ const commandHandlerDeps: ICommandHandlerDependencies = {
  */
 const serverDeps: IServerDependencies = {
   logger: createServerLogger(),
-  clientResponseCodec: () => false, // todo
+  clientResponseCodec: defaultCodec,
   commandDispatcher: (cmd) => defaultClientCmdDispatcher(cmd)(commandHandlerDeps),
   sharedConfig,
 }

@@ -8,3 +8,7 @@ export interface IClientRequest {
   id: string
   command: Command
 }
+
+export interface IClientPayload {
+  type: Command
+}
