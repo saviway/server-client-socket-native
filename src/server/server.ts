@@ -73,7 +73,6 @@ export const createServer =
         }
 
         s.on('end', () => {
-          deps.logger.log('Server is stopping...')
           // clear intervals if exists
           if (timer) {
             clearInterval(timer)

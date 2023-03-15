@@ -6,19 +6,7 @@ import { map, filter } from 'fp-ts/Array'
 import { CLIENT_ID_SEPARATOR, MESSAGE_SEPARATOR } from '../shared/constants'
 import { IClientPayload, IClientRequest } from '../shared/types'
 import { pipe } from 'fp-ts/function'
-
-/**
- * Convert Buffer into string
- * @param buff
- */
-export const bufferToString = (buff: Buffer): string => buff.toString()
-
-/**
- * Split series of client messages into array of message
- * @param str
- */
-export const splitClientMessages = (str: string): Array<string> =>
-  str.split(MESSAGE_SEPARATOR).filter((c) => !!c)
+import { bufferToString, splitMessagesToChunks } from '../shared/utils/parsers'
 
 /**
  * Parse array of client raw payload into array of Either with left value as error message or right value as IClientResponse
@@ -52,7 +40,7 @@ export const parseClientMessages = (
 export const parseClientRequestsPipeline = (
   data: Buffer
 ): Array<E.Either<string, IClientRequest>> =>
-  pipe(data, bufferToString, splitClientMessages, parseClientMessages)
+  pipe(data, bufferToString, splitMessagesToChunks, parseClientMessages)
 
 export const getAwaitTime =
   (k: string) =>

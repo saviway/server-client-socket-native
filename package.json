@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start-server": "node ./dist/src/server/index.js",
+    "start-client": "node ./dist/src/client/index.js",
     "test": "jest"
   },
   "keywords": [],
