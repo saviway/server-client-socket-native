@@ -1,12 +1,17 @@
 import * as net from 'net'
 import { Lazy, pipe } from 'fp-ts/function'
-
+import { map } from 'fp-ts/Array'
+import * as E from 'fp-ts/Either'
 import { ISharedConfig } from '../shared/types/ISharedConfig'
 import { Reader } from 'fp-ts/Reader'
 import { IClientDependencies } from './types'
-import { Command, IClientPayload } from '../shared/types'
+import { Command, IClientPayload, IClientRequest } from '../shared/types'
+import { parseServerResponsePipeline } from './clientOps'
 
-const createCommand = (cmd: Command): IClientPayload => ({ type: cmd })
+const createCommand = (cmd: Command, clientId: string): IClientRequest => ({
+  command: cmd,
+  id: clientId,
+})
 
 export type ClientManager = {
   socket: net.Socket
@@ -26,16 +31,26 @@ export const createClient =
         resolve({
           socket,
           sendToServer: (cmd: Command) => {
-            socket.write(pipe(cmd, createCommand, deps.requestCodec))
+            socket.write(pipe(cmd, (c) => createCommand(c, clientId), deps.requestCodec))
           },
         })
       })
 
       socket.setEncoding('utf-8')
 
-      socket.on('data', (data: Buffer) => {
-        // todo
-      })
+      socket.on('data', (data: Buffer) =>
+        pipe(
+          data,
+          parseServerResponsePipeline,
+          map((r) =>
+            pipe(
+              r,
+              E.map((v) => deps.responseDispatcher(v)),
+              E.mapLeft((e) => deps.logger.log(`Error: ${e}`))
+            )
+          )
+        )
+      )
 
       socket.on('end', () => deps.logger.log(`Client ${clientId} stopped`))
     })
