@@ -5,8 +5,8 @@ import * as chalk from 'chalk'
  * Logger to log server actions
  * @param prefix
  */
-export const createServerLogger = (prefix: string = 'server'): ILogger => ({
+export const createClientLogger = (prefix: string = 'client'): ILogger => ({
   log: (...data: any[]) => {
-    console.log(chalk.green(`${prefix}::> ` + data.join(' ')))
+    console.log(chalk.grey(`${prefix}::> ` + data.join(' ')))
   },
 })
