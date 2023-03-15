@@ -51,6 +51,9 @@ export const createClient =
           )
         )
       )
+      socket.on('close', () => {
+        deps.logger.log(`Client ${clientId} disconnected`)
+      })
 
       socket.on('end', () => deps.logger.log(`Client ${clientId} stopped`))
     })
