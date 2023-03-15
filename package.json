@@ -4,6 +4,8 @@
   "description": "Example of client - server app based on socket interaction",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start-server": "node ./dist/src/server/index.js",
     "test": "jest"
   },
   "keywords": [],

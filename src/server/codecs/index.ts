@@ -1,0 +1,1 @@
+export { defaultCodec } from './defaultCodec'
