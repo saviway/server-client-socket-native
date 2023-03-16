@@ -1,6 +1,7 @@
 import { IGenericServerResponse } from '../../shared/types'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { MESSAGE_SEPARATOR } from '../../shared/constants'
 
 /**
  * Codec to encode the response to the client
@@ -13,12 +14,18 @@ export const defaultCodec = (res: IGenericServerResponse): string =>
       () => 'Unable to encode response.'
     ),
     E.fold(
-      (err) =>
-        JSON.stringify({
+      (err) => {
+        const res = JSON.stringify({
           type: 'Error',
           error: err,
           updatedAt: new Date().getTime(),
-        }),
-      (v) => v
+        })
+        return `${res}${MESSAGE_SEPARATOR}`
+      },
+      (v) => `${v}${MESSAGE_SEPARATOR}`
     )
   )
+
+/*
+
+ */
