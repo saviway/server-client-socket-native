@@ -1,7 +1,6 @@
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
-import { createServer } from './server'
-import * as net from 'net'
+import { createServer, ServerManager } from './server'
 import * as dotenv from 'dotenv'
 import { ISharedConfig } from '../shared/types/ISharedConfig'
 import * as process from 'process'
@@ -53,8 +52,8 @@ const start = () =>
       (e) => {
         throw new Error(e.message)
       },
-      (srv: net.Server) => {
-        srv.listen(sharedConfig.port, () => {
+      (srvMng: ServerManager) => {
+        srvMng.server.listen(sharedConfig.port, () => {
           serverDeps.logger.log('Server started')
         })
       }

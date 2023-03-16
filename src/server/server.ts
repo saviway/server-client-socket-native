@@ -7,7 +7,7 @@ import { pipe } from 'fp-ts/function'
 import { IServerDependencies } from './types'
 import { IClientRequest, IGenericServerResponse } from '../shared/types'
 import { getAwaitTime, parseClientRequestsPipeline } from './serverOps'
-import { serverConfig } from './serverConfig'
+import * as process from 'process'
 
 export type ServerConfig = {
   enableHeartBeatResponse?: boolean
@@ -15,8 +15,13 @@ export type ServerConfig = {
 
   awaitingTime: Record<string, number>
 }
+
+export type ServerManager = {
+  server: net.Server
+  shutdown: () => void
+}
 export const createServer =
-  (srvConfig: ServerConfig): Reader<IServerDependencies, E.Either<Error, net.Server>> =>
+  (srvConfig: ServerConfig): Reader<IServerDependencies, E.Either<Error, ServerManager>> =>
   (deps) => {
     // timer to count interval of heart beat
     let timer: ReturnType<typeof setInterval> | null = null
@@ -50,7 +55,7 @@ export const createServer =
 
           // send response to the Client
           responses.forEach((r) => {
-            const awaitTime = getAwaitTime(r.type)(serverConfig.awaitingTime)
+            const awaitTime = getAwaitTime(r.type)(srvConfig.awaitingTime)
             if (awaitTime > 0) {
               setTimeout(() => s.write(deps.clientResponseCodec(r)), awaitTime)
             } else {
@@ -59,8 +64,7 @@ export const createServer =
           })
         })
         // heart beat
-        if (O.getOrElse(() => false)) O.fromNullable(srvConfig.enableHeartBeatResponse)
-        {
+        if (O.getOrElse(() => false)(O.fromNullable(srvConfig.enableHeartBeatResponse))) {
           const interval = O.getOrElse(() => 1000)(O.fromNullable(srvConfig.heartBeatInterval))
           timer = setInterval(() => {
             s.write(
@@ -79,7 +83,10 @@ export const createServer =
           }
         })
       })
-      return E.right(server)
+      return E.right({
+        server,
+        shutdown: () => process.exit(0),
+      })
     } catch (e) {
       return E.left(new Error(`Unable to create server due to: ${e}`))
     }
