@@ -7,6 +7,7 @@ import { Reader } from 'fp-ts/Reader'
 import { IClientDependencies } from './types'
 import { Command, IClientPayload, IClientRequest } from '../shared/types'
 import { parseServerResponsePipeline } from './clientOps'
+import * as process from 'process'
 
 const createCommand = (cmd: Command, clientId: string): IClientRequest => ({
   command: cmd,
@@ -16,6 +17,8 @@ const createCommand = (cmd: Command, clientId: string): IClientRequest => ({
 export type ClientManager = {
   socket: net.Socket
   sendToServer: (msg: Command) => void
+
+  shutdown: () => void
 }
 export const createClient =
   (
@@ -32,6 +35,9 @@ export const createClient =
           socket,
           sendToServer: (cmd: Command) => {
             socket.write(pipe(cmd, (c) => createCommand(c, clientId), deps.requestCodec))
+          },
+          shutdown: () => {
+            process.exit(0)
           },
         })
       })
